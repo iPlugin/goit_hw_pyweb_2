@@ -1,22 +1,27 @@
 from prettytable import PrettyTable
+from prettytable.colortable import ColorTable, Themes
+
+from rich.console import Console
+
+
 from clsSecurity import *
 from clsValidInfo import *
-# from rich.console import Console
+
 
 class Command:
     def __init__(self):
-        self.sec = Security()
-        # self.cons = Console()
+        self.cls_sec = Security()
+        self.paint = Console()
+        self.na = NameValid
+        self.su = SurnameValid
+        self.ag = AgeValid
+        self.ph = PhoneValid
         self.list = ["/add", "/delete", "/edit", "/search", "/view", "/help"]
         self.values = ["name", "surname", "age", "phone"]
-        self.n = NameValid
-        self.s = SurnameValid
-        self.a = AgeValid
-        self.p = PhoneValid
 
     def help(self):
-        self.sec.cls()
-        table = PrettyTable()
+        self.cls_sec.cls()
+        table = ColorTable(theme=Themes.OCEAN)
         table.field_names = ["Command", "Explanation"]
         table.add_rows([
                 ["/add", "- add new user"],
@@ -30,157 +35,207 @@ class Command:
         table.align = "l"
         table.sortby = "Command"
         print(table)
-        print("Read table and choose command")
+        self.paint.print("[blue]\nRead table and choose command[/blue]")
 
-    def add(self):
-        self.sec.cls()
-        print("\n\tAdding new user 1/4\n")
-        print("Name:")
-        new_name = input(str("(add)>>> "))
-        name = self.n(new_name).valid()
+    def add(self): # Good
+        self.cls_sec.cls()
+        self.paint.print("[green]\n\tAdding new user [blue]1/4[/blue]\n[/green]")
+        self.paint.print("[green]Name:[/green]")
+        new_name = self.paint.input(str("[blue](add)[/blue] >>> "))
+        name = self.na(new_name).valid()
 
-        self.sec.cls()
-        print("\n\tAdding new user 2/4\n")
-        print("Surname:")
-        new_surname = input(str("(add)>>> "))
-        surname = self.s(new_surname).valid()
+        self.cls_sec.cls()
+        self.paint.print("[green]\n\tAdding new user [blue]2/4[/blue]\n[/green]")
+        self.paint.print("[green]Surname:[/green]")
+        new_surname = self.paint.input(str("[blue](add)[/blue] >>> "))
+        surname = self.su(new_surname).valid()
         
-        self.sec.cls()
-        print("\n\tAdding new user 3/4\n")
-        print("Age:")
-        new_age = input(str("(add)>>> "))
-        age = self.a(new_age).valid()
+        self.cls_sec.cls()
+        self.paint.print("[green]\n\tAdding new user [blue]3/4[/blue]\n[/green]")
+        self.paint.print("[green]Age:[/green]")
+        new_age = self.paint.input(str("[blue](add)[/blue] >>> "))
+        age = self.ag(new_age).valid()
 
-        self.sec.cls()
-        print("\n\tAdding new user 4/4\n")
-        print("Phone:")
-        new_phone = input(str("(add)>>> "))
-        phone = self.p(new_phone).valid()
+        self.cls_sec.cls()
+        self.paint.print("[green]\n\tAdding new user [blue]4/4[/blue]\n[/green]")
+        self.paint.print("[green]Phone:[/green]")
+        new_phone = self.paint.input(str("[blue](add)[/blue] >>> "))
+        phone = self.ph(new_phone).valid()
 
-        new_user = [name, surname, age, phone]
-        self.sec.user_dump(new_user)
-        self.sec.user_added(name, surname)
-        self.sec.cls()
-        print(f"\n\tDone! {name} {surname} added\n")
+        new_user = {"name": name, "surname": surname, "age": age, "phone": phone}
+        self.cls_sec.decorate_loading()
+        data = self.cls_sec.bin_load()  
+        self.cls_sec.bin_add(data, new_user)
+        self.cls_sec.rep_add(name, surname)
+
+        self.cls_sec.cls()
+        self.paint.print(f"[green]\n\tDone! {name} {surname} added\n[/green]")
 
     def delete(self):
-        button = True
-        while button:
-            self.sec.cls()
-            print("\n\tFinding user for delete\n")
-            print("Phone:")
-            phone = input(str("(delete)>>> "))
-            user = self.sec.user_find(phone)
-            if user == "None":
-                self.sec.cls()
-                print("\n\tUnavailable user\n")
-                break
-            else:
-                self.sec.cls()
-                table = PrettyTable()
+        self.cls_sec.cls()
+        data = self.cls_sec.bin_load()
+        if data['users'] != []:
+            lst_users = []
+            self.paint.print("[green]\n\tFinding user for delete\n[/green]")
+            self.paint.print("[yellow]Phone:[/yellow]")
+            phone = self.paint.input(str("[blue](delete)[/blue] >>> "))
+            self.cls_sec.decorate_loading()
+
+            for user in data['users']:
+                for k, v in user.items():
+                    if phone == v:
+                        lst_users.append(user)
+            self.cls_sec.cls()
+
+            if lst_users != []:
+                table = ColorTable(theme=Themes.OCEAN)
                 table.field_names = ["Name", "Surname", "Age", "Phone"]
-                table.add_row([user["name"], user["surname"], user["age"], user["phone"]])
+                for user in lst_users:
+                    table.add_row([user['name'], user['surname'], user['age'], user['phone']])
                 table.align = 'l'
+                table.sortby = "Name"
                 print(table)
 
                 answer = ''
-                while answer != "y" and answer != "N":
-                    print("Are you sure? (y/N)")
-                    answer = input(str(">>> "))
-                    if answer == "y":
-                        self.sec.user_delete(user)
-                        button = False
-                        print("\n\tUser deleted\n")
-                        break
-                    else:
-                        self.sec.cls()
-                        button = False
-                        print("\n\tDelete been cancelled\n")
-                        break
+                while answer != 'Y' and answer != 'n':
+                    answer = self.paint.input(str("[green]Are you sure?[/green] [blue]Y/n:[/blue] >>> "))
+                if answer == 'Y':
+                    for users in data['users']:
+                        for user in lst_users:
+                            if users['phone'] == user['phone']:
+                                name = users['name']
+                                surname = users['surname']
+                                data['users'].pop(data["users"].index(users))
+                    self.cls_sec.bin_add(data, '')
+                    self.cls_sec.rep_delete(name, surname)
+
+                    self.cls_sec.cls()
+                    self.paint.print(f"[green]\n\tDeleted {name} {surname}\n[/green]")
+
+                else:
+                    self.cls_sec.cls()
+                    self.paint.print("[red]\n\tDelete been cancelled\n[/red]")
+            else:
+                self.cls_sec.cls()
+                self.paint.print("[red]\n\tUnvilible user\n[/red]")
+        else:
+            self.cls_sec.cls()
+            self.paint.print("[red]\n\tTable empty\n[/red]")
             
-    def edit(self):
-        button = True
-        while button:
-            self.sec.cls()
-            print("\n\tFinding user for edit\n")
-            print("Phone:")
-            phone = input(str(">>> "))
-            user = self.sec.user_find(phone)
-            if user == "None":
-                self.sec.cls()
-                print("\n\tUnavailable user\n")
-                break
-            else:
-                self.sec.cls()
-                table = PrettyTable()
+    def edit(self): # Good
+        self.cls_sec.cls()
+        data = self.cls_sec.bin_load()
+        if data['users'] != []:
+            lst_users = []
+            self.paint.print("[green]\n\tFinding user for edit\n[/green]")
+            self.paint.print("[yellow]Phone:[/yellow]")
+            phone = self.paint.input(str("[blue](edit)[/blue] >>> "))
+            self.cls_sec.decorate_loading()
+
+            for user in data['users']:
+                for k, v in user.items():
+                    if phone == v:
+                        lst_users.append(user)
+            self.cls_sec.cls()
+            if lst_users != []:
+                table = ColorTable(theme=Themes.OCEAN)
                 table.field_names = ["Name", "Surname", "Age", "Phone"]
-                table.add_row([user["name"], user["surname"], user["age"], user["phone"]])
+                for user in lst_users:
+                    table.add_row([user['name'], user['surname'], user['age'], user['phone']])
                 table.align = 'l'
+                table.sortby = "Name"
                 print(table)
 
                 answer = ''
-                value = ''
-                while answer != "y" and answer != "N":
-                    print("Are you sure? (y/N)")
-                    answer = input(str(">>> "))
-                    if answer == 'y':
-                        while value != "name" and value != "surname" and value != "age" and value != "phone":
-                            print("| Name / Surname / Age / Phone |")
-                            value = input(str(">>> ")).lower()
-                        print(f"Old value: {user[value]}")
-                        new = input(str("New value: "))
-                        self.sec.user_edit(user, value, new)
-                        self.sec.user_edit_report(user)
-                        self.sec.cls()
-                        print("\n\tUser Edited\n")
-                        button = False
-                    else:
-                        self.sec.cls()
-                        button = False
-                        print("\n\tEdit been cancelled\n")
-                        break
+                categories = ''
+                new_value = ''
+                while answer != 'Y' and answer != 'n':
+                    answer = self.paint.input(str("[green]Are you sure?[/green] [blue]Y/n:[/blue] >>> "))
+                if answer == 'Y':
+                    while categories != 'name' and categories != 'surname' and categories != 'age' and categories != 'phone':
+                        print("| Name | Surname | Age | Phone |")
+                        categories = self.paint.input(str("[yellow]Your decision:[/yellow] >>> ")).lower()
+                    while new_value == '':
+                        new_value = self.paint.input(str("[yellow]New value:[/yellow] >>> "))
                     
-    def search(self):
-        while True:
-            self.sec.cls()
-            print("\n\tFinding user for search\n")
-            print("Anything:")
-            value = input(str(">>> "))
-            if value == '':
-                self.sec.cls()
-                print("\n\tUnavailable user\n")
-                break
-            users = self.sec.user_anything(value)
-            if users == []:
-                self.sec.cls()
-                print("\n\tUnavailable user\n")
-                break
+                    for users in data['users']:
+                        if (users['name'] == user['name'] and users['surname'] == user['surname'] and
+                            users['age'] == user['age'] and users['phone'] == user['phone']):
+                            users[categories] = new_value
+
+                            self.cls_sec.decorate_loading()
+                            self.cls_sec.rep_edit(user['name'], categories, new_value)
+                            self.cls_sec.bin_add(data, '')
+                            self.cls_sec.cls()
+                            self.paint.print(f"[green]\nDone! {user['name']} change {categories} > {new_value}\t\n[/green]")
+
+                else:
+                    self.cls_sec.cls()
+                    self.paint.print("[green]\n\tEdit been cancelled\n[/green]")
             else:
-               
-                field_names = ["Name", "Surname", "Age", "Phone"]
-                add_row = [field_names[0].lower, field_names[1].lower(), field_names[2].lower(), field_names[3].lower()]
-                self.sec.table_for_search(users, field_names, add_row)
+                self.cls_sec.cls()
+                self.paint.print("[red]\n\tUnvilible user\n[/red]")
+
+        else:
+            self.cls_sec.cls()
+            self.paint.print("[red]\n\tTable empty\n[/red]")
+                    
+    def search(self): # Good
+        self.cls_sec.cls()
+        data = self.cls_sec.bin_load()
+        if data['users'] != []:
+            lst_users = []
+            self.paint.print("[green]\n\tFind user of search\n[/green]")
+            self.paint.print("[blue]Anythiks:[/blue]")
+            value = input(str(">>> "))
+            self.cls_sec.decorate_loading()
+            for user in data['users']:
+                for k, v in user.items():
+                    if value in v:
+                        lst_users.append(user)
+            if lst_users != []:
+                self.cls_sec.cls()
+                self.paint.print(f"[green]\n\tСпівпадіння [blue]{value}[/blue] є тут\n[/green]")
+                table = ColorTable(theme=Themes.OCEAN)
+                table.field_names = ["Name", "Surname", "Age", "Phone"]
+                for user in lst_users:
+                    table.add_row([user['name'], user['surname'], user['age'], user['phone']])
+                table.align = 'l'
+                table.sortby = "Name"
+                print(table)
 
                 pause = input()
-                self.sec.cls()
-                print("\n\tYou can't hide :)\n")
-                break
-
-    def view(self):
-        data = self.sec.bin_load()
-        if data != []:
-            table = PrettyTable()
-            table.field_names = ["Name", "Surname", "Age", "Phone"]
-            for user in data['user']:
-                table.add_row([user["name"], user["surname"], user["age"], user["phone"]])
-            table.align = 'l'
-            self.sec.cls()
-            print("\n\tTable opened\n")
-            self.sec.users_view_report()
-            print(table)
-            pause = input()
-            self.sec.cls()
-            print("\n\tTable closed\n")
+                self.cls_sec.cls()
+                self.paint.print("[green]\n\tHixto ne hide\n[/green]")
+            else:
+                self.cls_sec.cls()
+                self.paint.print("[red]\n\tUnvilible user\n[/red]")
         else:
-            self.sec.cls()
-            print("\n\tTable empty\n")
+            self.cls_sec.cls()
+            self.paint.print("[red]\n\tTable empty\n[/red]")
+        
+    def view(self): # Good
+        data = self.cls_sec.bin_load()
+        self.cls_sec.cls()
+        self.paint.print("[green]\n\tLoading...\n[/green]")
+        self.cls_sec.decorate_loading()
+        self.cls_sec.cls()
+
+        if data['users'] != []:
+            self.cls_sec.cls()
+            self.paint.print("[green]\n\tTable opened\n[/green]")
+            table = ColorTable(theme=Themes.OCEAN)
+            table.field_names = ["Name", "Surname", "Age", "Phone"]
+            for user in data['users']:
+                table.add_row([user['name'], user['surname'],user['age'], user['phone']])
+            table.align = 'l'
+            table.sortby = "Name"
+            print(table)
+
+            pause = input()
+            self.cls_sec.rep_view()
+            self.cls_sec.cls()
+            self.paint.print("[red]\n\tTable closed\n[/red]")
+        else:
+            self.cls_sec.cls()
+            self.paint.print("[red]\n\tTable empty\n[/red]")

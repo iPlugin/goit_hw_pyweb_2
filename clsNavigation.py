@@ -3,23 +3,19 @@ from clsSecurity import Security
 
 class Navigation:
     def __init__(self):
-        self.com = Command()
-        self.sec = Security()
+        self.cls_com = Command()
+        self.cls_sec = Security()
     
     def nav_commands(self, answer):
         if answer == "/help":
-            self.com.help()
-
-            
+            self.cls_com.help()
         elif answer == "/add":
-            self.com.add()
+            self.cls_com.add()
         elif answer == "/delete":
-            self.com.delete()
+            self.cls_com.delete()
         elif answer == "/edit":
-            self.com.edit()
+            self.cls_com.edit()
         elif answer == "/search":
-            self.com.search()
+            self.cls_com.search()
         else: # answer == "/view":
-            self.com.view()
-        
-    
+            self.cls_com.view()

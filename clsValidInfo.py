@@ -26,6 +26,7 @@ class AgeValid(clsValidInfo):
 class PhoneValid(clsValidInfo):
     def __init__(self, phone):
         self.phone = phone
+        # Якщо повторюється номер - помилка
 
     def valid(self):
         return f"{self.phone}".strip()
