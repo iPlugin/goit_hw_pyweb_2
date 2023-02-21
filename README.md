@@ -1,2 +1,2 @@
-Welcome in iPluginBot
-# poetry -> black (namefile).py = Форматує код 
+# Welcome in iPluginBot
+poetry -> black (namefile).py = Форматує код 
