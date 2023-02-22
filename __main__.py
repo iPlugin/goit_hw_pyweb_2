@@ -1,5 +1,8 @@
 import os
 from os import system
+from clsNavigation import Navigation
+from rich.console import Console
+import pickle
 
 # About author #
 AUTHOR = "iPlugin"
@@ -11,22 +14,6 @@ FILE_IMR = 'requirements.txt'
 FILE_BIN = "data/data.bin"
 FILE_TXT = 'data/report.txt'
 # # constant # #
-
-# Settings imports #
-# packages = system(f"pip freeze > {FILE_IMR}")
-# packets = ['pickle', 'prettytable', 'tqdm', 'rich']
-# with open(FILE_IMR, 'r') as f:
-#     file = f.read()
-
-# for value in packets:
-#     if value not in file:
-#         system(f"pip install {value}")
-# # Settings imports # #
-
-
-from clsNavigation import Navigation
-from rich.console import Console
-import pickle
 
 
 if __name__ == "__main__":

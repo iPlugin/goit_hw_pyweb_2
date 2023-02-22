@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "iplugin"
+version = "0.1.0"
+description = "My iPlugin Bot"
+authors = ["iPlugin <real.andreychuk@icloud.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+prettytable = "3.6.0"
+tqdm = "4.64.1"
+rich = "13.3.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
