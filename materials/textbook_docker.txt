@@ -1,0 +1,25 @@
+docker --version = Підтягує версію
+docker pull <images>:<tag> = Скачує images 
+docker push iplugin/iplugin_bot = Викачує images
+docker images rm <images>:<tag> = Видаляє <images>
+docker run {value} <images>:<tag> =
+    value:
+        + --name <name> = Імя контейнера
+        + -p 27017:27017 = Port <outside:inside>
+	+ -v = збереження файлів локально
+        + -d = запускає процес у фоновому режимі 
+	+ -it = заходитьв термінал контейнера
+
+docker stop ID|<name> = Зупинити контейнер
+docker kill ID|<name> = Зупинити примусово контейнер
+docker build . -t iplugin/iplugin_bot = Створюю images
+docker ps = Активні контейнери
+docker ps -a = Всі контейнери
+docker rm ID|<name> = Видаляє контейнер
+docker images = Всі скачені images
+docker exec -it ID|<name> bin/sh = Заходимо Databases
+    + touch main.py = створити файл .py
+    + rm main.py = видалити файл .py
+    + ls = всі що є на цьому рівні
+    + exit = вийти з терміналу контейнера
+docker inspect caad = Описує все що в контейнері
